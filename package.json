@@ -98,7 +98,8 @@
   "deprecated": false,
   "description": "Ian Test evershop.",
   "files": [
-    "packages/*"
+    "bin",
+    "src"
   ],
   "homepage": "http://evershop.io/",
   "repository": {
@@ -120,5 +121,5 @@
     "user:changePassword": "evershop user:changePassword",
     "user:create": "evershop user:create"
   },
-  "version": "1.0.0-rc.8.4"
+  "version": "1.0.0-rc.8.5"
 }
