@@ -10,7 +10,7 @@ module.exports.getSessionConfig = (cookieSecret) => {
     }),
     secret: cookieSecret,
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000
+      maxAge: 24 * 60 * 60 * 1000 * 190
     },
     resave: getConfig('system.session.resave', false),
     saveUninitialized: getConfig('system.session.saveUninitialized', false)
