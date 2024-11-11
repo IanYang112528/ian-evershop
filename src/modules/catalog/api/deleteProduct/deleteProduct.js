@@ -6,17 +6,21 @@ const {
   INVALID_PAYLOAD
 } = require('@evershop/evershop/src/lib/util/httpStatus');
 const { join } = require('path');
-const { rmdirSync,existsSync } = require('fs');
+const { unlinkSync,existsSync } = require('fs');
 const { CONSTANTS } = require('@evershop/evershop/src/lib/helpers');
-const getSecondDirctory = (filePath) => {
-  // 查找最后一个斜杠的位置
-  const lastSlashIndex = filePath.lastIndexOf("/")
-  // 查找倒数第二个斜杠的位置
-  const secondLastSlashIndex = filePath.lastIndexOf("/", lastSlashIndex - 1)
-  if (secondLastSlashIndex !== -1) {
-    return filePath.substring(0, secondLastSlashIndex)
-  }
-  return null
+const deleteFile = (image)=>{
+  const thumb = image.replace(/.([^.]*)$/, '-thumb.$1');
+  const single = image.replace(/.([^.]*)$/, '-single.$1');
+  const listing = image.replace(/.([^.]*)$/, '-list.$1');
+  const arr = [image,thumb,single,listing];
+  arr.map(item=>{
+    const path = join(CONSTANTS.MEDIAPATH, item)
+    if(existsSync(path)) {
+      console.log("delete image",path)
+      unlinkSync(path);
+    }
+  })
+ 
 }
 // eslint-disable-next-line no-unused-vars
 module.exports = async (request, response, delegate, next) => {
@@ -43,16 +47,10 @@ module.exports = async (request, response, delegate, next) => {
       return;
     }
     if(product.image) {
-      const path = join(CONSTANTS.MEDIAPATH, getSecondDirctory(product.image))
-      if(existsSync(path)) {
-        rmdirSync(path,{ recursive: true });
-      }
+      deleteFile( product.image);
       const productImage = await select().from('product_image').where('product_image_product_id', '=', product.product_id).execute(pool);
       productImage.map(item=>{
-        const path = join(CONSTANTS.MEDIAPATH, getSecondDirctory(item.image))
-        if(existsSync(path)) {
-          rmdirSync(path,{ recursive: true });
-        }
+        deleteFile( item.image);
       })
     }
     
