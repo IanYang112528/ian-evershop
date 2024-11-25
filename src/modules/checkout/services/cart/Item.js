@@ -120,9 +120,7 @@ module.exports.Item = class Item extends DataObject {
               /.([^.]*)$/,
               '-thumb.$1'
             );
-            return fs.existsSync(path.join(CONSTANTS.MEDIAPATH, thumb))
-              ? `/assets${thumb}`
-              : null;
+            return `/assets${thumb}`;
           } else {
             return null;
           }
