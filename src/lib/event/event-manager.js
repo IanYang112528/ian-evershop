@@ -1,7 +1,16 @@
-const { select, del } = require('@evershop/postgres-query-builder');
-const { pool } = require('@evershop/evershop/src/lib/postgres/connection');
-const { loadSubscribers } = require('./loadSubscribers');
-const { callSubscribers } = require('./callSubscibers');
+const {
+  select,
+  del
+} = require('@evershop/postgres-query-builder');
+const {
+  pool
+} = require('@evershop/evershop/src/lib/postgres/connection');
+const {
+  loadSubscribers
+} = require('./loadSubscribers');
+const {
+  callSubscribers
+} = require('./callSubscibers');
 
 const loadEventInterval = 5000;
 const syncEventInterval = 2000;
@@ -45,7 +54,7 @@ async function loadEvents(count) {
   }
 
   if (events.length > 0) {
-    query.and(
+    query.andWhere(
       'uuid',
       'NOT IN',
       events.map((event) => event.uuid)
