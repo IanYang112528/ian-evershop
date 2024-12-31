@@ -61,7 +61,6 @@ module.exports.Item = class Item extends DataObject {
               '=',
               'product.product_id'
             );
-
           const product = await query
             .where('product_id', '=', this.dataSource.product_id)
             .load(pool);
@@ -142,7 +141,8 @@ module.exports.Item = class Item extends DataObject {
       resolvers: [
         async function resolver() {
           const bargain_price = parseFloat(this.dataSource.product.bargain_price);
-          return toPrice(Math.max(bargain_price,this.dataSource.product.price));
+
+          return toPrice(Math.max(bargain_price, this.dataSource.product.price));
           // return toPrice(this.dataSource.product.price);
         }
       ],
@@ -184,14 +184,39 @@ module.exports.Item = class Item extends DataObject {
       dependencies: ['product_id']
     },
     {
+      key: 'sales_event_discount_amount',
+      resolvers: [
+        async function resolver() {
+          const query = select().from('product_sales_event');
+          query
+            .innerJoin('sales_event')
+            .on(
+              'product_sales_event.sales_event_id',
+              '=',
+              'sales_event.sales_event_id'
+            );
+          const sales_event = await query
+            .where('product_id', '=', this.dataSource.product_id)
+            .andWhere('status', '=', true)
+            .load(pool);
+          if (sales_event) {
+            const discount_amount = sales_event.discount_amount;
+            return discount_amount
+          }
+          return 0;
+        }
+      ],
+      dependencies: ['product_id']
+    },
+    {
       key: 'final_price',
       resolvers: [
         async function resolver() {
-          return toPrice(this.dataSource.product.price);
-          // return toPrice(this.getData('product_price')); // TODO This price should include the custom option price
+
+          return toPrice(this.dataSource.product.price - this.getData('sales_event_discount_amount'));
         }
       ],
-      dependencies: ['product_price']
+      dependencies: ['product_price', 'sales_event_discount_amount']
     },
     {
       key: 'final_price_incl_tax',
@@ -222,7 +247,7 @@ module.exports.Item = class Item extends DataObject {
         async function resolver() {
           return toPrice(
             this.getData('final_price') * this.getData('qty') +
-              this.getData('tax_amount')
+            this.getData('tax_amount')
           );
         }
       ],
