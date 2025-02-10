@@ -18,6 +18,7 @@ module.exports.getFilterableAttributes = async (categoryId) => {
   const query = select('attribute.attribute_name', 'attribute_name')
     .select('attribute.type', 'type')
     .select('attribute.is_filterable', 'is_filterable')
+    .select('attribute.is_show_front', 'is_show_front')
     .select('product_attribute_value_index.attribute_id', 'attribute_id')
     .select('attribute.attribute_code', 'attribute_code')
     .select('product_attribute_value_index.option_id', 'option_id')
@@ -49,6 +50,7 @@ module.exports.getFilterableAttributes = async (categoryId) => {
         attributeName: attributeData[i].attribute_name,
         attributeId: attributeData[i].attribute_id,
         attributeCode: attributeData[i].attribute_code,
+        isShowFront: attributeData[i].is_show_front,
         options: [
           {
             optionId: attributeData[i].option_id,
