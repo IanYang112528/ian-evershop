@@ -1,4 +1,4 @@
-const { select } = require('@evershop/postgres-query-builder');
+const { select, insert } = require('@evershop/postgres-query-builder');
 const { default: axios } = require('axios');
 const { pool } = require('@evershop/evershop/src/lib/postgres/connection');
 const { buildUrl } = require('@evershop/evershop/src/lib/router/buildUrl');
@@ -32,7 +32,7 @@ module.exports = async (request, response, delegate, next) => {
           'CAPTURE'
         );
         const responseData = await axios.post(
-          `${getContextValue(request, 'homeUrl').replace("http://","https://")}${buildUrl(
+          `${getContextValue(request, 'homeUrl').replace("http://", "https://")}${buildUrl(
             paymentIntent === 'CAPTURE'
               ? 'paypalCapturePayment'
               : 'paypalAuthorizePayment'
@@ -52,8 +52,14 @@ module.exports = async (request, response, delegate, next) => {
         if (responseData.data.error) {
           throw new Error(responseData.data.error.message);
         }
+        const send_email = await insert('send_email').given({
+          subscriber_type: "order_placed",
+          subscriber_type_uuid: order.uuid,
+          customer_email: order.customer_email,
+          remark: ""
+        }).execute(pool);
         // Emit event to add order placed event
-        await emit('order_placed', { ...order });
+        await emit('order_placed', { ...order, send_email_id: send_email.send_email_id });
         // Redirect to order success page
         // eslint-disable-next-line camelcase
         response.redirect(302, `${buildUrl('checkoutSuccess')}/${order_id}`);
