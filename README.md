@@ -12,7 +12,7 @@ order_placed
 ```
 
 ```
-1.0.0-rc.8.16
+1.0.0-rc.8.17
 src\modules\checkout\pages\frontStore\all\[context]detectCurrentCart[auth].js
 
 ```
