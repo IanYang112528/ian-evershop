@@ -32,5 +32,5 @@
     "user:changePassword": "evershop user:changePassword",
     "user:create": "evershop user:create"
   },
-  "version": "1.0.0-rc.8.16"
+  "version": "1.0.0-rc.8.17"
 }
