@@ -21,39 +21,54 @@ module.exports = async (request, response, delegate, next) => {
   if (cart) {
     //将BuyNow 的cart进行处理
     let uuid = cart.uuid;
-    let _uuid = cart.user_ip;
-
-    if (_uuid) {
-      if (_uuid == 'buynow') {
-        await update('cart')
+    if (!request.url.includes("?ajax=")) {
+      const buy_now = await select()
+        .from('buy_now')
+        .where('sid', '=', request.sessionID)
+        .and('status', '=', 1)
+        .and('cur_cart_id', '=', cart.cart_id)
+        .load(pool);
+      if (buy_now) {
+        const {
+          cur_cart_id,
+          pre_cart_id
+        } = buy_now;
+        if (cur_cart_id == pre_cart_id) {
+          await update('cart')
+            .given({
+              status: 0
+            })
+            .where('uuid', '=', uuid)
+            .execute(pool);
+        } else if (pre_cart_id) {
+          let _cart = await select()
+            .from('cart')
+            .where('cart_id', '=', pre_cart_id)
+            .andWhere('status', '=', 0)
+            .load(pool);
+          if (_cart) {
+            await update('cart')
+              .given({
+                status: 1
+              })
+              .where('uuid', '=', _cart.uuid)
+              .execute(pool);
+            await update('cart')
+              .given({
+                status: 0
+              })
+              .where('uuid', '=', cart.uuid)
+              .execute(pool);
+            uuid = _cart.uuid;
+          }
+        }
+        await update('buy_now')
           .given({
             status: 0,
-            user_ip: null
+            updated_at: new Date()
           })
-          .where('uuid', '=', uuid)
+          .where('buy_now_id', '=', buy_now.buy_now_id)
           .execute(pool);
-      } else {
-        let _cart = await select()
-          .from('cart')
-          .where('uuid', '=', _uuid)
-          .andWhere('status', '=', 0)
-          .load(pool);
-        if (_cart) {
-          await update('cart')
-            .given({
-              status: 1
-            })
-            .where('uuid', '=', _cart.uuid)
-            .execute(pool);
-          await update('cart')
-            .given({
-              status: 0,
-              user_ip: null
-            })
-            .where('uuid', '=', cart.uuid)
-            .execute(pool);
-          uuid = _cart.uuid;
-        }
       }
     }
     setContextValue(request, 'cartId', uuid);
