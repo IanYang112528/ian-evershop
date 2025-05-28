@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-const { insert, select,update } = require('@evershop/postgres-query-builder');
+const { insert, select } = require('@evershop/postgres-query-builder');
 const { pool } = require('@evershop/evershop/src/lib/postgres/connection');
 const {
   INVALID_PAYLOAD,
@@ -32,18 +32,8 @@ module.exports = async (request, response, delegate, next) => {
     // Validate address
     validateAddress(address);
     // Save billing address
-    let shipping_address_id = cart.data.shipping_address_id;
-    if(shipping_address_id){
-      await update('cart_address')
-      .given({
-        ...address
-      })
-      .where('cart_address_id', '=', cart.data.shipping_address_id)
-      .execute(pool);
-    }else {
-      const result = await insert('cart_address').given(address).execute(pool);
-      shipping_address_id = result.insertId;
-    }
+    const result = await insert('cart_address').given(address).execute(pool);
+
     // Set address ID to cart
     if (type === 'shipping') {
       // Find the shipping zone
@@ -77,16 +67,16 @@ module.exports = async (request, response, delegate, next) => {
         'shipping_zone_id',
         parseInt(zone.shipping_zone_id, 10)
       );
-      await cart.setData('shipping_address_id', parseInt(shipping_address_id, 10));
+      await cart.setData('shipping_address_id', parseInt(result.insertId, 10));
     } else {
-      await cart.setData('billing_address_id', parseInt(shipping_address_id, 10));
+      await cart.setData('billing_address_id', parseInt(result.insertId, 10));
     }
     // Save cart
     await saveCart(cart);
 
     const createdAddress = await select()
       .from('cart_address')
-      .where('cart_address_id', '=', shipping_address_id)
+      .where('cart_address_id', '=', result.insertId)
       .load(pool);
 
     response.status(OK);
