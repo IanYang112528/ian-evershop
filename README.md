@@ -22,3 +22,9 @@ src\modules\checkout\pages\frontStore\all\[context]detectCurrentCart[auth].js
 src\modules\checkout\pages\frontStore\all\[context]detectCurrentCart[auth].js
 
 ```
+
+```
+1.0.0-rc.8.19
+src\modules\checkout\api\addCartAddress\saveAddress.js
+
+```
