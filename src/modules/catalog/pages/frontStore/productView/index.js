@@ -29,6 +29,23 @@ module.exports = async (request, response, delegate, next) => {
     const product = await query.load(pool);
 
     if (product === null) {
+      //ian add 
+      const query2 = select().from('product');
+      query2.where('product.uuid', '=', request.params.uuid);
+      query2.andWhere('status', '=', 0);
+      const product2 = await query2.load(pool);
+      if (product2) {
+        let categoryQuery = select().from('category').where('category.category_id', '=', product2.category_id)
+        const category = await categoryQuery.load(pool);
+        if (category) {
+          response.redirect(`/category/${category.uuid}`);
+        } else {
+          response.redirect('/');
+        }
+      } else {
+        response.redirect('/');
+      }
+      //ian add 
       response.status(404);
       next();
     } else {
