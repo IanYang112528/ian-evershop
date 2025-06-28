@@ -14,7 +14,6 @@ const { error } = require('@evershop/evershop/src/lib/log/debuger');
 const { getCoreModules } = require('./loadModules');
 const { addDefaultMiddlewareFuncs } = require('./addDefaultMiddlewareFuncs');
 const { getEnabledExtensions } = require('../extension');
-const rateLimit = require('express-rate-limit');
 module.exports.createApp = () => {
   /** Create express app */
   const app = express();
@@ -89,11 +88,5 @@ module.exports.createApp = () => {
     });
   });
   app.use(Handler.middleware());
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15分钟
-    max: 100, // 限制每个IP在15分钟内最多只能访问100次
-    message: '请求过于频繁，请稍后再试'
-  });
-  app.use(limiter);
   return app;
 };
