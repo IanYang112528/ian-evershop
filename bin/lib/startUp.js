@@ -1,16 +1,30 @@
 const http = require('http');
-const { Handler } = require('@evershop/evershop/src/lib/middleware/Handler');
+const {
+  Handler
+} = require('@evershop/evershop/src/lib/middleware/Handler');
 const spawn = require('cross-spawn');
 const path = require('path');
-const { error } = require('@evershop/evershop/src/lib/log/debuger');
-const { createApp } = require('./app');
+const {
+  error
+} = require('@evershop/evershop/src/lib/log/debuger');
+const {
+  createApp
+} = require('./app');
 const normalizePort = require('./normalizePort');
 const onListening = require('./onListening');
 const onError = require('./onError');
-const { getCoreModules } = require('./loadModules');
-const { migrate } = require('./bootstrap/migrate');
-const { loadBootstrapScript } = require('./bootstrap/bootstrap');
-const { getEnabledExtensions } = require('../extension');
+const {
+  getCoreModules
+} = require('./loadModules');
+const {
+  migrate
+} = require('./bootstrap/migrate');
+const {
+  loadBootstrapScript
+} = require('./bootstrap/bootstrap');
+const {
+  getEnabledExtensions
+} = require('../extension');
 let app = createApp();
 /** Create a http server */
 const server = http.createServer(app);
@@ -55,8 +69,7 @@ module.exports.start = async function start(cb) {
   // Spawn the child process to manage events
   const child = spawn(
     'node',
-    [path.resolve(__dirname, '../../src/lib/event/event-manager.js')],
-    {
+    [path.resolve(__dirname, '../../src/lib/event/event-manager.js')], {
       stdio: 'inherit'
     }
   );
@@ -64,6 +77,17 @@ module.exports.start = async function start(cb) {
     error(`Error spawning event processor: ${err}`);
   });
   child.unref();
+
+  const jobChild = spawn(
+    'node',
+    [path.resolve(__dirname, '../../src/lib/cron/cron.js')], {
+      stdio: 'inherit'
+    }
+  );
+  jobChild.on('error', (err) => {
+    error(`Error spawning event processor: ${err}`);
+  });
+  jobChild.unref();
 };
 
 module.exports.updateApp = function updateApp(cb) {
