@@ -3,10 +3,13 @@
     "name": "The Nguyen",
     "url": "https://evershop.io"
   },
+<<<<<<< HEAD
   "bundleDependencies": false,
   "dependencies": {
     "node-cron": "^3.0.3"
   },
+=======
+>>>>>>> fde3bb5ed778a6025959892a0faf0b9b16ebd35c
   "deprecated": false,
   "description": "Ian Test evershop.",
   "files": [
@@ -33,5 +36,5 @@
     "user:changePassword": "evershop user:changePassword",
     "user:create": "evershop user:create"
   },
-  "version": "1.0.0-rc.8.21"
+  "version": "1.0.0-rc.8.23"
 }

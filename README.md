@@ -37,3 +37,15 @@ src\modules\checkout\api\addCartAddress\saveAddress.js
 src/modules/catalog/pages/frontStore/productView/index.js
 
 ```
+
+```
+1.0.0-rc.8.21
+/bin/lib/app.js
+
+```
+
+```
+1.0.0-rc.8.22
+/bin/lib/app.js
+
+```
