@@ -7,7 +7,7 @@ async function start() {
     if (process.env.GAGAB2B_CRON) {
         cron.schedule(process.env.GAGAB2B_CRON, async () => {
             try {
-                await emit('upload_giga_product')
+                await emit('upload_giga_product', +new Date())
             } catch (error) {
                 console.error('定时任务执行失败:', error.message);
             }
